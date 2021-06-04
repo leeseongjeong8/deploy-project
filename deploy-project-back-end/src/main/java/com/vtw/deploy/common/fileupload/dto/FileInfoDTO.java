@@ -1,5 +1,7 @@
 package com.vtw.deploy.common.fileupload.dto;
-
+/*
+ * @author 정진하
+ */
 public class FileInfoDTO {
 	private String name;
 	private String url;

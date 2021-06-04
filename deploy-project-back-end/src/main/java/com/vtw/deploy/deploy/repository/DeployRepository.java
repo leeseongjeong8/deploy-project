@@ -7,7 +7,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import com.vtw.deploy.deploy.dto.DeployDTO;
-
+/*
+ * @author 진영
+ */
 @Mapper
 public interface DeployRepository {
 	

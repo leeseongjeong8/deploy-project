@@ -6,8 +6,9 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.vtw.deploy.common.codemgmt.dto.CodeMgmtDTO;
-
-
+/*
+ * @author 정진하
+ */
 @Mapper
 public interface CodeMgmtRepository {
 	

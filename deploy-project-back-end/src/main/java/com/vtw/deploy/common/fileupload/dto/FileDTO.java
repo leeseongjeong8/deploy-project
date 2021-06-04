@@ -1,7 +1,9 @@
 package com.vtw.deploy.common.fileupload.dto;
 
 import java.sql.Date;
-
+/*
+ * @author 정진하
+ */
 public class FileDTO {
 	
 	private int fileNo,typeNo;

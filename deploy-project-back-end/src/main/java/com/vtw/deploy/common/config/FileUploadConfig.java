@@ -2,7 +2,9 @@ package com.vtw.deploy.common.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-
+/*
+ * @author 정진하
+ */
 @Component
 @ConfigurationProperties("upload")
 public class FileUploadConfig {

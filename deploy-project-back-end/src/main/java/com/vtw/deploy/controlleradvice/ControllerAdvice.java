@@ -1,4 +1,4 @@
-package com.vtw.deploy.common.controlleradvice;
+package com.vtw.deploy.controlleradvice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

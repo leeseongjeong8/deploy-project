@@ -23,7 +23,9 @@ import com.vtw.deploy.script.exception.ScriptException;
 import com.vtw.deploy.script.repository.ScriptRepository;
 import com.vtw.deploy.script.service.ScriptService;
 import com.vtw.deploy.script.util.ScriptUtil;
-
+/*
+ * @author 진영
+ */
 @Service
 public class DeployServiceImpl implements DeployService {
 
@@ -36,7 +38,6 @@ public class DeployServiceImpl implements DeployService {
 	@Autowired
 	private FileRepository fileRepository;
 
-	// 이성정 작성
 	@Autowired
 	private ScriptService scriptService;
 
@@ -47,7 +48,6 @@ public class DeployServiceImpl implements DeployService {
 	private CodeMgmtRepository codeRepository;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-	// 이성정 작성 end
 
 	@Transactional(rollbackFor = ScriptException.class) //체크 예외는 commit처리된다 따라서 rollbackFor 속성지정필요
 	public int insertDeploy(DeployDTO deploy) throws Exception {
@@ -93,12 +93,11 @@ public class DeployServiceImpl implements DeployService {
 				fileRepository.insertDeployFile(file);
 			}
 		}
-
-		// 3.script 저장
+		// 3.script 저장 @성정
 
 		if (!deploy.getScriptDTO().isEmpty()) {
 		
-			// 이성정 작성
+		
 			List<ScriptDTO> scriptList = deploy.getScriptDTO();
 
 			try {
@@ -108,7 +107,7 @@ public class DeployServiceImpl implements DeployService {
 			}
 		}
 
-		// 4.알집 업로드 및 다운로드
+		// 4.알집 업로드 및 다운로드  @성정
 		FileDTO file = new FileDTO();
 		if (!deploy.getScriptDTO().isEmpty()) {
 		

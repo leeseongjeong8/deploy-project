@@ -1,5 +1,7 @@
 package com.vtw.deploy.common.fileupload.message;
-
+/*
+ * @author 정진하
+ */
 public class ResponseMessage {
 	private String message;
 	private Object data;

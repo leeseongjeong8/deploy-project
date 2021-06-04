@@ -22,7 +22,9 @@ import com.vtw.deploy.common.fileupload.message.ResponseMessage;
 import com.vtw.deploy.deploy.dto.DeployDTO;
 import com.vtw.deploy.deploy.service.DeployService;
 import com.vtw.deploy.script.dto.ScriptDTO;
-
+/*
+ * @author 진영
+ */
 @RestController
 @RequestMapping({ "/deploy" })
 public class DeployController {

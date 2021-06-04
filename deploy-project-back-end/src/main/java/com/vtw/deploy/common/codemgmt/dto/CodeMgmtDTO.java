@@ -1,7 +1,9 @@
 package com.vtw.deploy.common.codemgmt.dto;
 
 import java.sql.Date;
-
+/*
+ * @author 정진하
+ */
 public class CodeMgmtDTO {
 	
 	private String codeId;

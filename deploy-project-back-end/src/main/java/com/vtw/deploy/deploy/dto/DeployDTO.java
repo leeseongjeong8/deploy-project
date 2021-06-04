@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.List;
 
 import com.vtw.deploy.script.dto.ScriptDTO;
-
+/*
+ * @author 진영
+ */
 public class DeployDTO {
 	
 	//deploy

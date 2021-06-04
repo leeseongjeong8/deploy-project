@@ -6,9 +6,9 @@ import java.util.Map;
 import com.vtw.deploy.common.fileupload.dto.FileDTO;
 import com.vtw.deploy.deploy.dto.DeployDTO;
 import com.vtw.deploy.script.dto.ScriptDTO;
-
-
-public interface DeployService {	
+/*
+ * @author 진영
+ */public interface DeployService {	
 	
 	public int insertDeploy(DeployDTO deploy) throws Exception;
 	
@@ -22,7 +22,7 @@ public interface DeployService {
 	
 	public int updateDeployState(DeployDTO deploy);
 	
-	public List<DeployDTO> selectTeamDeploy(String codeName);
+	public List<DeployDTO> selectTeamDeploy(String codeName);  //@성정
 	
 	public Map<String, Object> selectTeamDeployList(String codeName);
 

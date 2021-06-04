@@ -3,8 +3,9 @@ package com.vtw.deploy.common.codemgmt.service;
 import java.util.List;
 
 import com.vtw.deploy.common.codemgmt.dto.CodeMgmtDTO;
-
-
+/*
+ * @author 정진하
+ */
 public interface CodeMgmtService {
 	
 	public List<CodeMgmtDTO> selectParentCodeList();
