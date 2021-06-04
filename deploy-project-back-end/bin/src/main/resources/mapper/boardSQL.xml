@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vtw.deploy.board.repository.BoardRepository">
+
+	<insert id="insertNotice" parameterType="boardDTO">
+		<selectKey order="BEFORE" resultType="int" keyProperty="boardNo">
+			SELECT BOARD_SEQ.nextval
+			FROM DUAL
+		</selectKey>
+		INSERT INTO BOARD(
+							BOARD_NO
+							,WRITER
+							,TITLE
+							,CONTENT
+							,BOARD_TYPE
+							,REGDATE
+							,VIEW_COUNT
+							)
+					VALUES(
+							#{boardNo}
+							,#{writer}
+							,#{title}
+							,#{contentBlob}
+							,'N'
+							,sysdate
+							,0
+							)
+	</insert>
+	
+	<select id="selectNotice" resultType="boardDTO">
+		SELECT	b.BOARD_NO
+				,b.TITLE
+				,b.WRITER
+				,b.REGDATE
+				,b.VIEW_COUNT
+				,b.TEAM
+				,NVL(f.COUNT,0) COUNT
+		FROM (SELECT 
+					b.BOARD_NO
+					,b.TITLE
+					,m.NAME WRITER
+					,b.REGDATE
+					,b.VIEW_COUNT
+					,m.TEAM
+				FROM BOARD b,MEMBER m
+				WHERE m.ID=b.WRITER) b , (SELECT TYPE_NO
+												 ,COUNT(*) COUNT
+											FROM FILES
+											WHERE TYPE = 'N'
+											AND DELETE_YN = 'N'
+											GROUP BY TYPE_NO ) f
+		WHERE b.BOARD_NO= f.TYPE_NO(+)		
+		ORDER BY 1 DESC	
+	</select>
+	
+	
+	<select id="selectNoticeDetail" resultType="boardDTO" parameterType="int">
+		SELECT 
+			b.BOARD_NO
+			,b.TITLE
+			,m.NAME writer
+			,b.CONTENT contentBlob
+			,b.UPDATE_DATE
+			,b.REGDATE
+			,m.PHONE
+			,m.ID
+			,b.VIEW_COUNT			
+		FROM BOARD b,MEMBER m
+		WHERE m.ID=b.WRITER
+		AND b.BOARD_NO=#{boardNo}
+	</select>
+	
+	<delete id="deleteNotice" parameterType="int">
+		DELETE BOARD
+		WHERE BOARD_NO = #{boardNo}
+	</delete>
+	
+	<update id="updateNotice" parameterType="boardDTO">
+		UPDATE BOARD
+		SET TITLE=#{title}
+			,CONTENT=#{contentBlob}
+			,UPDATE_DATE=TO_DATE(sysdate)
+		WHERE BOARD_NO = #{boardNo}
+	</update>
+	
+	<select id="selectSearchList" parameterType="boardDTO" resultType="boardDTO">
+		SELECT	b.BOARD_NO
+				,b.TITLE
+				,b.WRITER
+				,b.REGDATE
+				,b.VIEW_COUNT
+				,b.TEAM
+				,NVL(f.COUNT,0) COUNT
+		FROM (SELECT 
+					b.BOARD_NO
+					,b.TITLE
+					,m.NAME writer
+					,b.REGDATE
+					,b.CONTENT
+					,b.VIEW_COUNT
+					,m.TEAM
+			  FROM BOARD b,MEMBER m
+			  WHERE m.ID=b.WRITER
+				<choose>
+					<when test = 'team != "전체"'>
+						AND team = #{team}
+					</when>
+				</choose>
+						AND <choose>
+				   				<when test='type == "title"'>
+				    			title Like '%'||#{word}||'%'
+				  			    </when>
+				  			    <when test='type == "content"'>
+				  			    dbms_lob.instr(content, utl_raw.CAST_TO_RAW(#{word}), 1, 1) > 0
+				  			    </when>
+				   				<otherwise>
+				     			name Like '%'||#{word}||'%'
+				   				</otherwise>
+							</choose>) b, (SELECT TYPE_NO
+												 ,COUNT(*) COUNT
+											FROM FILES
+											WHERE TYPE = 'N'
+											AND DELETE_YN = 'N'
+											GROUP BY TYPE_NO ) f
+		WHERE b.BOARD_NO= f.TYPE_NO(+)		
+		ORDER BY 1 DESC
+	</select>
+	
+	<select id="selectTeamNotice" resultType="boardDTO" parameterType="string" >
+			SELECT	b.BOARD_NO
+				,b.TITLE
+				,b.WRITER
+				,b.REGDATE
+				,b.VIEW_COUNT
+				,b.TEAM
+				,NVL(f.COUNT,0) COUNT
+			FROM (SELECT 
+						b.BOARD_NO
+						,b.TITLE
+						,m.NAME writer
+						,b.REGDATE
+						,b.VIEW_COUNT
+						,m.TEAM
+					FROM BOARD b,MEMBER m
+					WHERE m.ID=b.WRITER
+					AND m.TEAM = #{team})b, (SELECT TYPE_NO
+											 ,COUNT(*) COUNT
+										FROM FILES
+										WHERE TYPE = 'N'
+										AND DELETE_YN = 'N'
+											GROUP BY TYPE_NO ) f
+			WHERE b.BOARD_NO= f.TYPE_NO(+)									
+			ORDER BY 1 DESC
+	</select>
+	
+	<update id="updateViewCount" parameterType="int" >
+		UPDATE BOARD
+		SET VIEW_COUNT = VIEW_COUNT+1
+		WHERE BOARD_NO = #{boardNo}
+	</update>
+	
+	<select id="selectDashboardNotice" resultType="boardDTO">
+	SELECT	b.BOARD_NO
+				,b.TITLE
+				,b.WRITER
+				,b.REGDATE
+				,b.TEAM
+				,NVL(f.COUNT,0) COUNT
+	  FROM (SELECT 
+					BOARD_NO
+					,TITLE
+					,WRITER
+					,TEAM
+					,REGDATE
+			  FROM  (SELECT 
+							BOARD_NO
+							,TITLE
+							,WRITER
+							,TEAM
+							,ROWNUM r
+							,REGDATE
+			  		  FROM  (SELECT 
+									b.BOARD_NO
+									,b.TITLE
+									,m.NAME writer
+									,m.TEAM
+									,b.REGDATE
+							FROM deploy.BOARD b,deploy.MEMBER m
+							WHERE m.ID=b.WRITER
+							ORDER BY 1 DESC))
+				 			WHERE r BETWEEN 1 and 5) b , (SELECT TYPE_NO
+																 ,COUNT(*) COUNT
+															FROM FILES
+															WHERE TYPE = 'N'
+															AND DELETE_YN = 'N'
+															GROUP BY TYPE_NO ) f
+		WHERE b.BOARD_NO= f.TYPE_NO(+)		
+		ORDER BY 1 DESC	
+		
+	</select>
+	
+</mapper>
+

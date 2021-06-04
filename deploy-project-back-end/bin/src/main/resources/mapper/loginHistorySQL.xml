@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vtw.deploy.user.repository.UserRepository">
+
+	<insert id="insertLogin" parameterType="string">
+		INSERT INTO LOGIN_HISTORY
+							VALUES(
+									LOGIN_HISTORY_SEQ.nextval
+									,#{id}
+									,'LOGIN'
+									,systimestamp
+									)
+	</insert>
+	
+	<insert id="insertLogout" parameterType="string">
+		INSERT INTO LOGIN_HISTORY
+							VALUES(
+									LOGIN_HISTORY_SEQ.nextval
+									,#{id}
+									,'LOGOUT'
+									,systimestamp
+									)
+	</insert>
+	
+	<select id="selectLoginConfirm" parameterType="string" resultType="string">
+		SELECT STATUS
+		FROM LOGIN_HISTORY
+		WHERE ID = #{id}
+		AND REGDATE = (SELECT MAX(REGDATE) 
+						FROM LOGIN_HISTORY
+						WHERE ID = #{id})
+	</select>
+	
+	
+</mapper>
+

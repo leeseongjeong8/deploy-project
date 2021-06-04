@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.vtw.deploy.deploy.repository.DeployRepository">
+
+	<select id="selectDeployDetail" resultType="deployDTO">
+		SELECT
+		A.DEPLOY_NO
+		,
+		A.DEPLOY_TITLE
+		, A.DEPLOY_DATE
+		, M.NAME WRITER
+		, M.TEAM
+		, A.DEPLOY_CONTENT
+		contentBlob
+		, A.EXPECTED_DATE
+		FROM DEPLOY_MANAGEMENT A
+		,MEMBER M
+		WHERE
+		M.ID = A.WRITER
+		AND DEPLOY_NO LIKE #{deployNo}
+
+	</select>
+
+	<select id="selectDeployZip" resultType="String">
+		SELECT
+		B.NAME
+		FROM
+		DEPLOY.DEPLOY_MANAGEMENT A,
+		DEPLOY.FILES B
+		WHERE A.DEPLOY_NO = B.TYPE_NO
+		AND TYPE= 'D'
+		AND DEPLOY_NO LIKE #{deployNo}
+		AND NAME LIKE '%zip'
+	</select>
+
+	<insert id="insertDeploy" parameterType="deployDTO">
+		<selectKey keyProperty="deployNo" resultType="int" order="BEFORE">
+			SELECT DEPLOY_SEQ.NEXTVAL
+			FROM DUAL
+		</selectKey>		
+			INSERT INTO DEPLOY_MANAGEMENT(
+				DEPLOY_NO
+				, DEPLOY_TITLE
+				, WRITER
+				, DEPLOY_DATE
+				, DEPLOY_CONTENT
+				, EXPECTED_DATE
+				, DEPLOY_STATE
+				, STATE_REASON
+				)
+			VALUES(
+				#{deployNo},
+				#{deployTitle},
+				#{writer},
+				TO_DATE(#{deployDate},'YYYY-MM-DD HH24:MI:SS'),
+				#{contentBlob},
+				#{expectedDate},
+				'배포준비',
+				null			
+			)
+	</insert>
+
+
+	<select id="selectDeploySearch" parameterType="deployDTO"
+		resultType="deployDTO">
+		SELECT
+		A.DEPLOY_NO
+		, A.DEPLOY_TITLE
+		, A.DEPLOY_DATE
+		, A.WRITER
+		,
+		A.DEPLOY_STATE
+		, A.STATE_REASON
+		, B.NAME
+		, A.TEAM
+		FROM (
+		SELECT
+		A.DEPLOY_NO
+		, A.DEPLOY_TITLE
+		, A.DEPLOY_DATE
+		, M.NAME WRITER
+		, A.DEPLOY_STATE
+		,
+		A.STATE_REASON
+		, M.TEAM
+		FROM DEPLOY.DEPLOY_MANAGEMENT A, DEPLOY.MEMBER M
+		WHERE
+		M.ID=A.WRITER
+		)A , (
+		SELECT B.TYPE_NO, NAME
+		FROM
+		DEPLOY.DEPLOY_MANAGEMENT A, DEPLOY.FILES B
+		WHERE A.DEPLOY_NO =
+		B.TYPE_NO
+		AND NAME LIKE '%zip'
+		) B
+		WHERE A.DEPLOY_NO = B.TYPE_NO(+)
+		<choose>
+			<when test="searchCategory == 'all'">
+				AND (DEPLOY_TITLE LIKE '%'||#{keyword}||'%'
+				OR WRITER
+				LIKE '%'||#{keyword}||'%'
+				OR DEPLOY_DATE LIKE '%'||#{keyword}||'%')
+			</when>
+			<when test="searchCategory == 'title'">
+				AND DEPLOY_TITLE LIKE '%'||#{keyword}||'%'
+			</when>
+			<when test="searchCategory == 'writer'">
+				AND WRITER LIKE '%'||#{keyword}||'%'
+			</when>
+			<when test="searchCategory == 'deployDate'">
+				AND DEPLOY_DATE LIKE
+				TO_DATE(#{keyword},'yyyy-mm-dd')
+			</when>
+			<when test="searchCategory == 'fileName'">
+				AND NAME LIKE '%'||#{keyword}||'%'
+			</when>
+		</choose>
+		ORDER BY DEPLOY_DATE DESC
+	</select>
+
+	<update id="updateDeployState" parameterType="deployDTO">
+		UPDATE
+		DEPLOY_MANAGEMENT SET
+		DEPLOY_STATE = #{deployState},
+		STATE_REASON =
+		#{stateReason}
+		WHERE DEPLOY_NO = #{deployNo}
+	</update>
+
+	<select id="selectTeamDeployList" resultType="deployDTO" parameterType="string">
+			 	SELECT 
+			A.DEPLOY_NO
+				 , A.DEPLOY_TITLE
+				 , A.DEPLOY_DATE 
+				 , A.WRITER
+				 , A.DEPLOY_STATE
+				 , A.STATE_REASON
+				 , B.NAME
+				 , A.TEAM
+		FROM (
+		SELECT
+			A.DEPLOY_NO
+				 , A.DEPLOY_TITLE
+				 , A.DEPLOY_DATE 
+				 , M.NAME WRITER
+				 , A.DEPLOY_STATE
+				 , A.STATE_REASON
+				 , M.TEAM
+		FROM DEPLOY.DEPLOY_MANAGEMENT A, DEPLOY.MEMBER M
+		WHERE M.ID=A.WRITER	
+		AND M.TEAM like #{team}
+		)A , (
+					SELECT B.TYPE_NO, NAME 
+					FROM  DEPLOY.DEPLOY_MANAGEMENT A, DEPLOY.FILES B
+					WHERE A.DEPLOY_NO = B.TYPE_NO	
+						  AND NAME LIKE '%zip'
+					) B
+		WHERE A.DEPLOY_NO = B.TYPE_NO(+);
+	</select>
+	
+
+	<select id="selectTeamDeploy" resultType="deployDTO">
+		SELECT deployNo, deployTitle, writer, deployDate, deployState, expectedDate, contentBlob
+		FROM(SELECT
+		D.DEPLOY_NO deployNo
+		, D.DEPLOY_TITLE deployTitle
+		, M.NAME
+		writer
+		, D.DEPLOY_DATE deployDate
+		, D.DEPLOY_STATE deployState
+		, D.EXPECTED_DATE expectedDate
+		, D.DEPLOY_CONTENT contentBlob
+		FROM
+		DEPLOY.DEPLOY_MANAGEMENT D ,
+		DEPLOY.MEMBER M
+		WHERE D.WRITER = M.ID
+		<choose>
+			<when test="codeName =='공통' ">
+				AND M.TEAM = '공통'
+			</when>
+			<when test="codeName =='추출' ">
+				AND M.TEAM = '추출'
+			</when>
+			<when test="codeName =='배포' ">
+				AND M.TEAM = '배포'
+			</when>
+			<when test="codeName =='토지' ">
+				AND M.TEAM = '토지'
+			</when>
+			<when test="codeName =='주민' ">
+				AND M.TEAM = '주민'
+			</when>
+			<when test="codeName =='제공' ">
+				AND M.TEAM = '제공'
+			</when>
+		</choose>
+		ORDER BY DEPLOY_DATE DESC)
+		WHERE ROWNUM BETWEEN 1 and 5
+	</select>
+</mapper>

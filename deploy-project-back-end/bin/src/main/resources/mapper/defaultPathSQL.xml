@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vtw.deploy.defaultpath.repository.DefaultPathRepository">
+
+	<update id="updateDefaultPath" parameterType = "DefaultPathDTO" >
+		UPDATE DEPLOY.DEFAULT_PATH
+		SET path = #{path}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
+

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vtw.deploy.schedule.repository.ScheduleRepository">
+
+	<select id="selectScheduleList" resultType="scheduleDTO">
+		SELECT
+			SCHEDULE_NO,
+			SCHEDULE_TITLE,
+			WRITER,
+			NAME,
+			START_DATE,
+			END_DATE,
+			COMPLETE_YN AS COMPLETE,
+			SCHEDULE_CONTENT,
+			S.REGDATE,
+			UPDATE_DATE,
+			COMPLETE_DATE,
+			TEAM
+		FROM SCHEDULE S JOIN MEMBER ON (WRITER = ID)
+	</select>
+
+	<insert id="insertSchedule" parameterType="scheduleDTO">
+		INSERT INTO SCHEDULE(
+				SCHEDULE_NO,
+				SCHEDULE_TITLE,
+				WRITER,
+				START_DATE,
+				END_DATE,
+				COMPLETE_YN,
+				SCHEDULE_CONTENT,
+				REGDATE,
+				UPDATE_DATE,
+				COMPLETE_DATE
+			)
+			VALUES(
+				SCHEDULE_SEQ.NEXTVAL,
+				#{scheduleTitle},
+				#{writer},
+				#{startDate},
+				#{endDate},
+				'N',
+				#{scheduleContent},
+				sysdate,
+				null,
+				null
+			)
+	</insert>
+	
+	<delete id="deleteSchedule" parameterType="int">
+		DELETE
+		FROM SCHEDULE
+		WHERE SCHEDULE_NO = #{scheduleNo}
+	</delete>
+	
+	<update id="updateSchedule" parameterType="scheduleDTO">
+		UPDATE SCHEDULE SET
+			SCHEDULE_TITLE = #{scheduleTitle},
+			START_DATE = #{startDate},
+			END_DATE = #{endDate},
+			SCHEDULE_CONTENT = #{scheduleContent},
+			UPDATE_DATE = #{updateDate},
+			COMPLETE_DATE = #{completeDate}
+		<if test="complete != null">
+			,COMPLETE_YN = #{complete}
+		</if>
+		WHERE SCHEDULE_NO = #{scheduleNo}
+	</update>
+	
+	<select id="selectOneSchedule" parameterType="int" resultType="scheduleHistoryDTO">
+		SELECT
+			SCHEDULE_NO,
+			SCHEDULE_TITLE,
+			WRITER,
+			START_DATE,
+			END_DATE,
+			COMPLETE_YN AS COMPLETE,
+			SCHEDULE_CONTENT,
+			REGDATE,
+			UPDATE_DATE,
+			COMPLETE_DATE
+		FROM SCHEDULE
+		WHERE SCHEDULE_NO = #{scheduleNo}
+	</select>
+	
+	<insert id="insertScheduleHistory" parameterType="scheduleHistoryDTO">
+		INSERT INTO SCHEDULE_HISTORY(
+				HISTORY_NO,
+				SCHEDULE_NO,
+				SCHEDULE_TITLE,
+				WRITER,
+				START_DATE,
+				END_DATE,
+				SCHEDULE_CONTENT,
+				REGDATE,
+				UPDATE_REASON,
+				TYPE
+			)
+			VALUES(
+				SCHEDULE_HISTORY_SEQ.NEXTVAL,
+				#{scheduleNo},
+				#{scheduleTitle},
+				#{writer},
+				#{startDate},
+				#{endDate},
+				#{scheduleContent},
+				sysdate,
+				#{updateReason},
+				#{type}
+			)
+	</insert>
+	
+	<select id="selectHistoryList" parameterType="int" resultType="scheduleHistoryDTO">
+		SELECT
+			*
+		FROM SCHEDULE_HISTORY
+		WHERE SCHEDULE_NO = #{scheduleNo} AND TYPE = 'U'
+	</select>
+	
+	<select id="selectTodayCount" resultType="userCountDTO">
+		SELECT
+			ID,
+			NAME,
+			TEAM,
+			COUNT(CASE WHEN COMPLETE_YN = 'N' AND TO_CHAR(SYSDATE,'YYYY-MM-DD') BETWEEN SUBSTR(START_DATE,1,10) AND SUBSTR(END_DATE,1,10) THEN 1 END) AS COUNT_N,
+			COUNT(CASE WHEN COMPLETE_YN = 'Y' AND TO_CHAR(SYSDATE,'YYYY-MM-DD') BETWEEN SUBSTR(START_DATE,1,10) AND SUBSTR(END_DATE,1,10) THEN 1 END) AS COUNT_Y,
+			COUNT(CASE WHEN COMPLETE_YN = 'N' AND TO_CHAR(SYSDATE,'YYYY-MM-DD') > SUBSTR(END_DATE,1,10) THEN 1 END) AS COUNT_E
+		FROM MEMBER LEFT JOIN SCHEDULE
+			ON (ID = WRITER)
+		GROUP BY ID, NAME, TEAM
+	</select>
+	
+	<select id="selectTodayList" parameterType="scheduleDTO" resultType="scheduleDTO">
+		SELECT
+			SCHEDULE_NO,
+			SCHEDULE_TITLE,
+			WRITER,
+			NAME,
+			START_DATE,
+			END_DATE,
+			COMPLETE_YN AS COMPLETE,
+			SCHEDULE_CONTENT,
+			S.REGDATE,
+			UPDATE_DATE,
+			COMPLETE_DATE,
+			TEAM
+		FROM SCHEDULE S JOIN MEMBER ON (WRITER = ID)
+		WHERE WRITER = #{writer}
+		<choose>
+			<when test='complete == "E"'>
+				AND COMPLETE_YN = 'N'
+				AND (TO_CHAR(SYSDATE,'YYYY-MM-DD') > SUBSTR(END_DATE,1,10))
+			</when>
+			<otherwise>
+				AND COMPLETE_YN = #{complete}
+				AND (TO_CHAR(SYSDATE,'YYYY-MM-DD') BETWEEN SUBSTR(START_DATE,1,10) AND SUBSTR(END_DATE,1,10))
+			</otherwise>
+		</choose>
+	</select>
+	
+</mapper>

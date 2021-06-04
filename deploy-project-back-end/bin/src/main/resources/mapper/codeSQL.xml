@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vtw.deploy.common.codemgmt.repository.CodeMgmtRepository">
+	
+	<select id="selectParentCodeList" resultType="codeMgmtDTO">
+		SELECT CODE_ID,
+			   CODE_NAME,
+			   PARENT_CODE_ID,
+			   CODE_USE_YN,
+			   REGISTERER,
+			   REGDATE,
+			   MODIFIER,
+			   UPDATE_DATE,
+			   DSPL_ORDER
+		FROM   CODE_MANAGEMENT
+		WHERE  PARENT_CODE_ID IS NULL
+		ORDER BY DSPL_ORDER
+	</select>
+	
+	<select id="selectChildCodeList" resultType="codeMgmtDTO" parameterType="string">
+		SELECT CODE_ID,
+			   CODE_NAME,
+			   PARENT_CODE_ID,
+			   CODE_USE_YN,
+			   REGISTERER,
+			   REGDATE,
+			   MODIFIER,
+			   UPDATE_DATE,
+			   DSPL_ORDER
+		FROM   CODE_MANAGEMENT
+		WHERE  PARENT_CODE_ID = #{parentCodeId}
+		ORDER BY DSPL_ORDER
+	</select>
+	
+	<select id="selectTeamList"  resultType="codeMgmtDTO">
+		SELECT CODE_ID,
+			   CODE_NAME,
+			   PARENT_CODE_ID,
+			   CODE_USE_YN,
+			   REGISTERER,
+			   REGDATE,
+			   MODIFIER,
+			   UPDATE_DATE,
+			   DSPL_ORDER
+		FROM  CODE_MANAGEMENT
+		WHERE PARENT_CODE_ID = (
+								SELECT CODE_ID 
+								FROM CODE_MANAGEMENT 
+								WHERE CODE_NAME = 'TEAM'
+								)
+		ORDER BY DSPL_ORDER;
+	</select>
+	
+	<select id="selectPositionList" resultType="codeMgmtDTO">
+		SELECT CODE_ID,
+			   CODE_NAME,
+			   PARENT_CODE_ID,
+			   CODE_USE_YN,
+			   REGISTERER,
+			   REGDATE,
+			   MODIFIER,
+			   UPDATE_DATE,
+			   DSPL_ORDER
+		FROM  CODE_MANAGEMENT
+		WHERE PARENT_CODE_ID = (
+								SELECT CODE_ID 
+								FROM CODE_MANAGEMENT 
+								WHERE CODE_NAME = 'POSITION'
+								)
+		ORDER BY DSPL_ORDER;
+	</select>
+	<insert id="insertCode" parameterType="codeMgmtDTO">
+		INSERT INTO CODE_MANAGEMENT
+		VALUES(
+			#{codeId},
+			#{codeName},
+			#{parentCodeId},
+			#{codeUseYN},
+			sysdate,
+			#{registerer},
+			null,
+			null,
+			#{dsplOrder}
+		)
+	</insert>
+	<update id="updateCode" parameterType="codeMgmtDTO">
+		UPDATE CODE_MANAGEMENT
+		SET
+			
+			CODE_NAME = #{codeName},
+			PARENT_CODE_ID = #{parentCodeId},
+			CODE_USE_YN = #{codeUseYN},
+			MODIFIER = #{modifier},
+			UPDATE_DATE = sysdate,
+			DSPL_ORDER = #{dsplOrder}
+		WHERE CODE_ID = #{codeId}
+	</update>
+	
+	<select id="selectCheckParentDsplOrder" resultType="int" parameterType="int">
+		SELECT COUNT(*)
+		FROM CODE_MANAGEMENT
+		WHERE DSPL_ORDER=#{dsplOrder} AND PARENT_CODE_ID IS NULL
+	</select>
+	
+	<select id="selectCheckChildDsplOrder" resultType="int" parameterType="map">
+		SELECT COUNT(*)
+		FROM CODE_MANAGEMENT
+		WHERE DSPL_ORDER=#{dsplOrder} AND PARENT_CODE_ID =#{parentCodeId}
+	</select>
+	
+	<select id="selectCheckCodeId" resultType="int" parameterType="string">
+		SELECT COUNT(*)
+		FROM CODE_MANAGEMENT
+		WHERE CODE_ID = #{codeId}
+	</select>
+	
+	<select id="selectCheckParentCodeId" resultType="int" parameterType="string">
+		SELECT COUNT(CODE_ID)
+		FROM CODE_MANAGEMENT
+		WHERE CODE_ID = #{parentCodeId} AND PARENT_CODE_ID IS NULL
+	</select>
+	
+	<select id="selectSearchCodeList" resultType="codeMgmtDTO" parameterType="map">
+		SELECT CODE_ID,
+			   CODE_NAME,
+			   PARENT_CODE_ID,
+			   CODE_USE_YN,
+			   REGISTERER,
+			   REGDATE,
+			   MODIFIER,
+			   UPDATE_DATE,
+			   DSPL_ORDER
+		FROM   CODE_MANAGEMENT
+		WHERE  
+			<choose>
+				<when test='type == "codeId"'>
+				CODE_ID LIKE '%'||#{keyword}||'%'
+				</when>
+				<otherwise>
+     			CODE_NAME LIKE '%'||#{keyword}||'%'
+   				</otherwise>
+			</choose>
+	</select>
+	
+	<delete id="deleteCode" parameterType="string">
+		DELETE 
+		FROM CODE_MANAGEMENT
+		WHERE CODE_ID = #{codeId}
+	</delete>
+	
+	<select id="selectOneCodeByCodeId" parameterType="string" resultType="codeMgmtDTO">
+		SELECT CODE_ID,
+			   CODE_NAME,
+			   PARENT_CODE_ID,
+			   CODE_USE_YN,
+			   REGISTERER,
+			   REGDATE,
+			   MODIFIER,
+			   UPDATE_DATE,
+			   DSPL_ORDER
+		FROM  CODE_MANAGEMENT
+		WHERE CODE_ID = #{codeId}
+	</select>
+</mapper>
+

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vtw.deploy.user.repository.UserRepository">
+
+	<insert id="insertUser" parameterType="userDTO">
+		INSERT INTO MEMBER(
+							ID
+							,PASSWORD
+							,NAME
+							,POSITION
+							,PHONE
+							,EMAIL
+							,TEAM
+							,REGDATE
+							)
+					VALUES(
+							#{id}
+							,#{password}
+							,#{name}
+							,#{position}
+							,#{phone}
+							,#{email}
+							,#{team}
+							,sysdate
+							)
+	</insert>
+
+	<select id="selectCheckId" resultType="int" parameterType="string">
+		SELECT COUNT(*)
+		FROM MEMBER
+		WHERE ID=#{id}
+	</select>
+	
+	<select id="selectLogin" parameterType="string" resultType="userDTO">
+		  SELECT
+				ID
+				,PASSWORD
+				,NAME
+				,POSITION
+				,PHONE
+				,EMAIL
+				,TEAM
+				,REGDATE
+				
+			FROM MEMBER
+			WHERE ID = #{id}	
+	</select>
+	
+	<update id="updateUser" parameterType="userDTO">
+		UPDATE MEMBER
+		SET NAME = #{name}
+			,POSITION = #{position}
+			,EMAIL = #{email}
+			,PHONE = #{phone}
+			,TEAM = #{team}
+		WHERE ID = #{id}
+	</update>
+	
+	<select id="selectPassword" parameterType="userDTO" resultType="string">
+		SELECT PASSWORD
+		FROM MEMBER
+		WHERE ID = #{id}
+	</select>
+	
+	<update id="updatePassword" parameterType="userDTO">
+		UPDATE MEMBER
+		SET PASSWORD = #{password}
+		WHERE ID = #{id}
+	</update>
+	
+	<select id="selectId" parameterType="string" resultType="userDTO">
+		SELECT ID
+		FROM MEMBER
+		WHERE EMAIL = #{email}
+	</select>
+	
+	<select id="selectCount" parameterType="userDTO" resultType="int">
+		SELECT COUNT(*)
+		FROM MEMBER
+		WHERE ID = #{id}
+		AND EMAIL = #{email}
+	</select>
+	
+</mapper>
+

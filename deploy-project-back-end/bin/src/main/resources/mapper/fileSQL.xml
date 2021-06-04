@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vtw.deploy.common.repository.FileRepository">
+	
+	<insert id="insertNoticeFile" parameterType="fileDTO">
+		INSERT INTO FILES
+		VALUES(
+				FILES_SEQ.nextval
+				,#{name}
+				,#{directoryPath}
+				,'N'
+				,sysdate
+				,'N'
+				,#{typeNo}
+				)
+	</insert>
+	
+	<select id="selectNoticeFile" parameterType="int" resultType="fileDTO">
+		SELECT 
+				NAME
+				,DIRECTORY_PATH
+		FROM FILES
+		WHERE DELETE_YN = 'N'
+		AND TYPE = 'N'
+		AND TYPE_NO = #{typeNo}		
+	</select>
+	
+	<update id="updateNoticeFile" parameterType="int">
+		UPDATE FILES
+		SET DELETE_YN = 'Y'
+		WHERE TYPE_NO = #{typeNo}
+	</update>
+	
+	<delete id="deleteNoticeFile" parameterType="int">
+		DELETE FILES
+		WHERE TYPE_NO = #{typeNo}
+		AND TYPE = 'N' 
+	</delete>
+	
+	
+	<!-- deploy -->
+	<insert id="insertDeployFile" parameterType="fileDTO">
+		INSERT INTO FILES
+		VALUES(
+				FILES_SEQ.nextval
+				,#{name}
+				,#{directoryPath}
+				,'N'
+				,SYSDATE
+				,'D'
+				,#{typeNo}
+		)
+	</insert>
+	
+	<select id="selectDeployFile" parameterType="int" resultType="fileDTO">
+		SELECT 
+			NAME
+			,DIRECTORY_PATH
+		FROM FilES
+		WHERE DELETE_YN = 'N'
+		AND TYPE = 'D'
+		AND TYPE_NO = #{typeNo}	
+		AND NAME like '%zip' 
+	</select>
+	
+	
+	<select id="selectDeployFiles" parameterType="int" resultType="fileDTO">
+		SELECT 
+			NAME
+			,DIRECTORY_PATH
+		FROM deploy.FILES
+		WHERE DELETE_YN = 'N'
+		AND TYPE = 'D'
+		AND TYPE_NO = #{typeNo}	
+		AND NOT NAME LIKE '%zip';
+	</select>
+</mapper>
+

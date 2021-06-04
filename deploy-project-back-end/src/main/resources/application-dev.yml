@@ -1,0 +1,54 @@
+server:
+  port: 8080
+  error:    whitelabel:      enabled: false
+    
+spring:
+  datasource:
+    jndi-name: java:jboss/DEPLOY
+    driver-class-name: com.tmax.tibero.jdbc.TbDriver
+    url: jdbc:tibero:thin:@10.47.39.125:8629:DB_D_GMD
+    username: deploy
+    password: deploy
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.vtw.deploy.user.dto,
+                        com.vtw.deploy.schedule.dto,
+                        com.vtw.deploy.deploy.dto,
+                        com.vtw.deploy.script.dto,
+                        com.vtw.deploy.defaultpath.dto,
+                        com.vtw.deploy.board.dto,
+                        com.vtw.deploy.common.fileupload.dto,
+                        com.vtw.deploy.common.codemgmt.dto
+                     
+  configuration:
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: varchar
+
+logging:
+  level:
+    com.zaxxer.hikari: info
+    com.vtw.deploy: debug
+
+eips:
+  host: 10.47.39.126
+  username: eips
+  password: eips
+  
+gmdadmin:
+  host: 10.47.39.125
+  username: gmdadmin
+  password: gmdadmin
+  tbwapp-war-path: /home/gmdadmin/tbwapp/deployments/tbwapp.war/WEB-INF/classes
+  xml-sources: /home/gmdadmin/xmlSources
+  
+develop-server:
+  key-path: /home/eips/.ssh/id_ecdsa
+  deployed-sources : /data/deploy-project/uploads
+  xml-sources: /data/deploy-project/xmlSources
+
+upload:
+  path: /data/deploy-project/uploads

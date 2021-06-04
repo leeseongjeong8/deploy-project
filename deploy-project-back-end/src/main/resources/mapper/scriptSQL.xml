@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vtw.deploy.script.repository.ScriptRepository">
+	<insert id="insertScript">
+		INSERT INTO SCRIPT(
+			SCRIPT_NO
+			,DEPLOY_NO
+			,CATEGORY
+			,FILE_TYPE
+			,LOCAL_PATH
+			,DIRECTORY_PATH
+			,BACKUP_SCRIPT
+			,REFLECT_SCRIPT
+			,ROLLBACK_SCRIPT
+			) 
+		VALUES(
+		SCRIPT_SEQ.nextval
+			,#{deployNo}
+			,#{category}
+			,#{fileType}
+			,#{localPath}
+			,#{directoryPath}
+			,#{backupScript}
+			,#{reflectScript}
+			,#{rollbackScript} 
+		)
+	</insert>
+	
+	<select id="selectScriptDetail" resultType="ScriptDTO" parameterType="int">
+		SELECT 
+			SCRIPT_NO
+			,DEPLOY_NO
+			,CATEGORY
+			,FILE_TYPE
+			,LOCAL_PATH
+			,DIRECTORY_PATH
+			,BACKUP_SCRIPT
+			,REFLECT_SCRIPT
+			,ROLLBACK_SCRIPT
+		FROM SCRIPT
+		WHERE DEPLOY_NO = #{deployNo}
+	</select>
+</mapper>
